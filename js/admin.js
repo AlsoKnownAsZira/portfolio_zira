@@ -2,8 +2,13 @@
 // ADMIN DASHBOARD — Logic
 // ============================================
 
-const ADMIN_PASSWORD = 'admin123';
+const DEFAULT_PASSWORD = 'admin123';
+const PASSWORD_KEY = 'portfolio_admin_password';
 let currentPanel = 'hero';
+
+function getAdminPassword() {
+  return localStorage.getItem(PASSWORD_KEY) || DEFAULT_PASSWORD;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initLogin();
@@ -36,7 +41,7 @@ function initLogin() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const pw = document.getElementById('login-password').value;
-    if (pw === ADMIN_PASSWORD) {
+    if (pw === getAdminPassword()) {
       sessionStorage.setItem('admin_auth', 'true');
       overlay.classList.add('hidden');
       document.getElementById('admin-layout').classList.remove('locked');
@@ -150,6 +155,9 @@ function initPanels() {
 
   // GitHub config form
   document.getElementById('github-form').addEventListener('submit', saveGitHubConfigForm);
+
+  // Password form
+  document.getElementById('password-form').addEventListener('submit', changePassword);
 }
 
 // ---- Load All Panels ----
@@ -695,6 +703,33 @@ function saveContact(e) {
   savePortfolioData(data);
   markDraftChanged();
   showToast('Contact info saved! Click Publish to go live.', 'success');
+}
+
+// ---- Change Password ----
+function changePassword(e) {
+  e.preventDefault();
+  const current = document.getElementById('pw-current').value;
+  const newPw = document.getElementById('pw-new').value;
+  const confirmPw = document.getElementById('pw-confirm').value;
+
+  if (current !== getAdminPassword()) {
+    showToast('Current password is incorrect', 'error');
+    return;
+  }
+  if (newPw.length < 4) {
+    showToast('New password must be at least 4 characters', 'error');
+    return;
+  }
+  if (newPw !== confirmPw) {
+    showToast('New passwords do not match', 'error');
+    return;
+  }
+
+  localStorage.setItem(PASSWORD_KEY, newPw);
+  document.getElementById('pw-current').value = '';
+  document.getElementById('pw-new').value = '';
+  document.getElementById('pw-confirm').value = '';
+  showToast('Password changed successfully!', 'success');
 }
 
 // ---- Modal ----

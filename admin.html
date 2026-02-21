@@ -297,6 +297,29 @@
           </form>
         </div>
 
+        <!-- Change Password -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header"><h3>🔑 Change Password</h3></div>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">Change your admin dashboard login password. Default password is <code style="background:rgba(255,255,255,0.06);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.8rem;">admin123</code></p>
+          <form id="password-form">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" class="form-input" id="pw-current" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>New Password</label>
+                <input type="password" class="form-input" id="pw-new" minlength="4" required />
+              </div>
+              <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" class="form-input" id="pw-confirm" minlength="4" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Change Password</button>
+          </form>
+        </div>
+
         <!-- Data Management -->
         <div class="card" style="margin-bottom:1.5rem;">
           <div class="card-header"><h3>Data Management</h3></div>
