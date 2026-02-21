@@ -4,16 +4,43 @@
     "tagline": "Full-Stack Developer & UI/UX Designer",
     "description": "I craft beautiful, performant digital experiences that live at the intersection of design and technology.",
     "socials": [
-      { "platform": "GitHub", "url": "https://github.com", "icon": "github" },
-      { "platform": "LinkedIn", "url": "https://linkedin.com", "icon": "linkedin" },
-      { "platform": "Twitter", "url": "https://twitter.com", "icon": "twitter" },
-      { "platform": "Email", "url": "mailto:hello@example.com", "icon": "mail" }
+      {
+        "platform": "GitHub",
+        "url": "https://github.com",
+        "icon": "github"
+      },
+      {
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com",
+        "icon": "linkedin"
+      },
+      {
+        "platform": "Twitter",
+        "url": "https://twitter.com",
+        "icon": "twitter"
+      },
+      {
+        "platform": "Email",
+        "url": "mailto:hello@example.com",
+        "icon": "mail"
+      }
     ]
   },
   "about": {
     "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     "introduction": "I'm a passionate developer with 5+ years of experience building modern web applications. I love turning complex problems into simple, beautiful, and intuitive solutions. When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or enjoying a good cup of coffee.",
-    "chips": ["JavaScript", "TypeScript", "React", "Node.js", "Python", "Figma", "UI/UX Design", "PostgreSQL", "Docker", "AWS"]
+    "chips": [
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Python",
+      "Figma",
+      "UI/UX Design",
+      "PostgreSQL",
+      "Docker",
+      "AWS"
+    ]
   },
   "projects": [
     {
@@ -21,7 +48,12 @@
       "title": "E-Commerce Platform",
       "description": "A full-featured e-commerce platform with real-time inventory management, payment processing, and an intuitive admin dashboard.",
       "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop",
-      "tags": ["React", "Node.js", "MongoDB", "Stripe"],
+      "tags": [
+        "React",
+        "Node.js",
+        "MongoDB",
+        "Stripe"
+      ],
       "liveUrl": "https://example.com",
       "repoUrl": "https://github.com"
     },
@@ -30,7 +62,11 @@
       "title": "Task Management App",
       "description": "Collaborative task management application with real-time updates, drag-and-drop interfaces, and team productivity analytics.",
       "image": "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop",
-      "tags": ["Vue.js", "Firebase", "Tailwind CSS"],
+      "tags": [
+        "Vue.js",
+        "Firebase",
+        "Tailwind CSS"
+      ],
       "liveUrl": "https://example.com",
       "repoUrl": "https://github.com"
     },
@@ -39,7 +75,12 @@
       "title": "AI Content Generator",
       "description": "An AI-powered content generation tool that helps creators produce high-quality articles, social media posts, and marketing copy.",
       "image": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop",
-      "tags": ["Python", "OpenAI", "FastAPI", "React"],
+      "tags": [
+        "Python",
+        "OpenAI",
+        "FastAPI",
+        "React"
+      ],
       "liveUrl": "https://example.com",
       "repoUrl": "https://github.com"
     },
@@ -48,7 +89,11 @@
       "title": "Weather Dashboard",
       "description": "Beautiful weather dashboard with interactive maps, 7-day forecasts, and location-based alerts using real-time meteorological data.",
       "image": "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=600&h=400&fit=crop",
-      "tags": ["JavaScript", "D3.js", "OpenWeather API"],
+      "tags": [
+        "JavaScript",
+        "D3.js",
+        "OpenWeather API"
+      ],
       "liveUrl": "https://example.com",
       "repoUrl": "https://github.com"
     }
