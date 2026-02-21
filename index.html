@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Personal Portfolio — Developer & Designer"
+    />
+    <title>Portfolio — John Doe</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Ambient Background -->
+    <div class="bg-ambient"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">port<span>folio.</span></a>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#experience">Experience</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <button class="nav-hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div id="hero-content" class="hero-content"></div>
+    </section>
+
+    <!-- About -->
+    <section class="section" id="about">
+      <div class="section-inner reveal">
+        <span class="section-label">About Me</span>
+        <h2 class="section-title">Get to know me</h2>
+        <div id="about-content"></div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="section" id="projects">
+      <div class="section-inner reveal">
+        <span class="section-label">Work</span>
+        <h2 class="section-title">Featured Projects</h2>
+        <p class="section-subtitle">
+          A curated selection of projects I've worked on recently.
+        </p>
+        <div id="projects-grid" class="projects-grid"></div>
+      </div>
+    </section>
+
+    <!-- Experience & Education -->
+    <section class="section" id="experience">
+      <div class="section-inner reveal">
+        <div class="exp-edu-grid">
+          <!-- Experience -->
+          <div>
+            <span class="section-label">Experience</span>
+            <h2 class="section-title">Where I've worked</h2>
+            <div id="experience-timeline" class="timeline"></div>
+          </div>
+          <!-- Education -->
+          <div>
+            <span class="section-label">Education</span>
+            <h2 class="section-title">My education</h2>
+            <div id="education-timeline" class="timeline"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer / Contact -->
+    <footer class="footer" id="contact">
+      <div class="footer-inner">
+        <div id="footer-info" class="footer-info"></div>
+        <div id="footer-socials" class="footer-links"></div>
+      </div>
+      <div class="footer-bottom">
+        &copy; <span id="footer-year"></span> <span id="footer-name"></span>.
+        All rights reserved.
+      </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
