@@ -2,8 +2,10 @@
 // PORTFOLIO — App Logic
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  const data = getPortfolioData();
+document.addEventListener('DOMContentLoaded', async () => {
+  const data = await fetchPortfolioData();
+  if (!data) return;
+
   renderHero(data.hero);
   renderAbout(data.about);
   renderProjects(data.projects);
@@ -176,7 +178,6 @@ function initNavbar() {
   const hamburger = document.querySelector('.nav-hamburger');
   const navLinks = document.querySelector('.nav-links');
 
-  // Scroll effect
   window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
       navbar.classList.add('scrolled');
@@ -185,14 +186,12 @@ function initNavbar() {
     }
   });
 
-  // Mobile toggle
   if (hamburger) {
     hamburger.addEventListener('click', () => {
       hamburger.classList.toggle('active');
       navLinks.classList.toggle('active');
     });
 
-    // Close on link click
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         hamburger.classList.remove('active');

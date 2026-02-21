@@ -9,8 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initLogin();
   initSidebar();
   initPanels();
-  loadAllPanels();
+  initAdminData();
 });
+
+// ---- Init: load data from data.json ----
+async function initAdminData() {
+  const data = await loadAdminData();
+  if (data) {
+    loadAllPanels(data);
+  }
+  loadGitHubConfig();
+}
 
 // ---- Login ----
 function initLogin() {
@@ -18,7 +27,6 @@ function initLogin() {
   const form = document.getElementById('login-form');
   const errorMsg = document.getElementById('login-error');
 
-  // Check if already authenticated this session
   if (sessionStorage.getItem('admin_auth') === 'true') {
     overlay.classList.add('hidden');
     document.getElementById('admin-layout').classList.remove('locked');
@@ -51,13 +59,10 @@ function initSidebar() {
     });
   });
 
-  // Mobile toggle
   const toggle = document.getElementById('mobile-toggle');
   const sidebar = document.querySelector('.sidebar');
   if (toggle) {
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
+    toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
   }
 }
 
@@ -67,30 +72,24 @@ function switchPanel(panelId) {
   const panel = document.getElementById(`panel-${panelId}`);
   if (panel) panel.classList.add('active');
 
-  // Update header
   const titles = {
     hero: { title: 'Hero & Social Links', desc: 'Edit your hero section and social media links' },
     about: { title: 'About Me', desc: 'Manage your photo, introduction, and skills' },
     projects: { title: 'Projects', desc: 'Add, edit, or remove your portfolio projects' },
     experience: { title: 'Experience', desc: 'Manage your work experience entries' },
     education: { title: 'Education', desc: 'Manage your education history' },
-    settings: { title: 'Settings', desc: 'Export/import data and other settings' }
+    settings: { title: 'Settings', desc: 'GitHub deployment, export/import, and contact info' }
   };
 
   const info = titles[panelId] || { title: 'Dashboard', desc: '' };
   document.getElementById('panel-title').textContent = info.title;
   document.getElementById('panel-desc').textContent = info.desc;
-
-  // Close sidebar on mobile
   document.querySelector('.sidebar').classList.remove('open');
 }
 
 // ---- Initialize Panels ----
 function initPanels() {
-  // Hero form
   document.getElementById('hero-form').addEventListener('submit', saveHero);
-
-  // About form
   document.getElementById('about-form').addEventListener('submit', saveAbout);
   initChipsEditor();
 
@@ -121,37 +120,124 @@ function initPanels() {
     const file = e.target.files[0];
     if (file) {
       try {
-        await importDataFromJSON(file);
-        loadAllPanels();
+        const data = await importDataFromJSON(file);
+        loadAllPanels(data);
         showToast('Data imported successfully!', 'success');
       } catch (err) {
-        showToast('Failed to import: ' + err.message, 'error');
+        showToast('Import failed: ' + err.message, 'error');
       }
     }
   });
 
-  document.getElementById('btn-reset').addEventListener('click', () => {
-    if (confirm('Are you sure? This will reset all data to defaults.')) {
-      resetPortfolioData();
-      loadAllPanels();
-      showToast('Data reset to defaults', 'success');
+  document.getElementById('btn-reset').addEventListener('click', async () => {
+    if (confirm('Are you sure? This will reload data from the live site.')) {
+      clearLocalDraft();
+      const data = await fetchPortfolioData();
+      if (data) {
+        savePortfolioData(data);
+        loadAllPanels(data);
+      }
+      showToast('Data reloaded from live site', 'success');
     }
   });
 
   document.getElementById('btn-view-site').addEventListener('click', () => {
     window.open('index.html', '_blank');
   });
+
+  // Publish button
+  document.getElementById('btn-publish').addEventListener('click', handlePublish);
+
+  // GitHub config form
+  document.getElementById('github-form').addEventListener('submit', saveGitHubConfigForm);
 }
 
 // ---- Load All Panels ----
-function loadAllPanels() {
-  const data = getPortfolioData();
+function loadAllPanels(data) {
+  if (!data) data = getPortfolioData();
+  if (!data) return;
   loadHeroPanel(data.hero);
   loadAboutPanel(data.about);
   loadProjectsPanel(data.projects);
   loadExperiencePanel(data.experience);
   loadEducationPanel(data.education);
   loadContactPanel(data.contact);
+}
+
+// ---- Publish to GitHub ----
+async function handlePublish() {
+  const btn = document.getElementById('btn-publish');
+  const data = getPortfolioData();
+
+  if (!data) {
+    showToast('No changes to publish', 'error');
+    return;
+  }
+
+  const config = getGitHubConfig();
+  if (!config.owner || !config.repo || !config.token) {
+    showToast('Configure GitHub first! Go to Settings → GitHub Configuration', 'error');
+    switchPanel('settings');
+    document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelector('[data-panel="settings"]').classList.add('active');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Publishing...';
+
+  try {
+    await publishToGitHub(data);
+    clearLocalDraft();
+    showToast('✅ Published! Your site will update in ~30 seconds.', 'success');
+    updatePublishStatus('published');
+  } catch (err) {
+    showToast('Publish failed: ' + err.message, 'error');
+    updatePublishStatus('error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Publish to Live Site';
+  }
+}
+
+function updatePublishStatus(status) {
+  const indicator = document.getElementById('publish-status');
+  if (!indicator) return;
+  if (status === 'published') {
+    indicator.className = 'publish-status success';
+    indicator.textContent = '✓ Live — up to date';
+  } else if (status === 'draft') {
+    indicator.className = 'publish-status draft';
+    indicator.textContent = '● Unpublished changes';
+  } else if (status === 'error') {
+    indicator.className = 'publish-status error';
+    indicator.textContent = '✕ Publish failed';
+  }
+}
+
+function markDraftChanged() {
+  updatePublishStatus('draft');
+}
+
+// ---- GitHub Config ----
+function loadGitHubConfig() {
+  const config = getGitHubConfig();
+  document.getElementById('gh-owner').value = config.owner || '';
+  document.getElementById('gh-repo').value = config.repo || '';
+  document.getElementById('gh-token').value = config.token || '';
+  document.getElementById('gh-branch').value = config.branch || 'main';
+}
+
+function saveGitHubConfigForm(e) {
+  e.preventDefault();
+  const config = {
+    owner: document.getElementById('gh-owner').value.trim(),
+    repo: document.getElementById('gh-repo').value.trim(),
+    token: document.getElementById('gh-token').value.trim(),
+    branch: document.getElementById('gh-branch').value.trim() || 'main'
+  };
+  saveGitHubConfig(config);
+  showToast('GitHub configuration saved!', 'success');
 }
 
 // ---- Hero Panel ----
@@ -179,6 +265,7 @@ function addSocial() {
   data.hero.socials.push({ platform: '', url: '', icon: 'globe' });
   savePortfolioData(data);
   loadSocialLinks(data.hero.socials);
+  markDraftChanged();
 }
 
 function removeSocial(index) {
@@ -186,6 +273,7 @@ function removeSocial(index) {
   data.hero.socials.splice(index, 1);
   savePortfolioData(data);
   loadSocialLinks(data.hero.socials);
+  markDraftChanged();
   showToast('Social link removed', 'success');
 }
 
@@ -196,7 +284,6 @@ function saveHero(e) {
   data.hero.tagline = document.getElementById('hero-tagline').value;
   data.hero.description = document.getElementById('hero-description').value;
 
-  // Gather socials
   const socialItems = document.querySelectorAll('.social-item');
   data.hero.socials = Array.from(socialItems).map(item => ({
     platform: item.querySelector('[data-field="platform"]').value,
@@ -205,7 +292,8 @@ function saveHero(e) {
   }));
 
   savePortfolioData(data);
-  showToast('Hero section saved!', 'success');
+  markDraftChanged();
+  showToast('Hero section saved! Click Publish to go live.', 'success');
 }
 
 // ---- About Panel ----
@@ -213,14 +301,12 @@ function loadAboutPanel(about) {
   document.getElementById('about-photo').value = about.photo || '';
   document.getElementById('about-intro').value = about.introduction || '';
 
-  // Photo preview
   const photoPreview = document.getElementById('photo-preview');
   if (about.photo) {
     photoPreview.src = about.photo;
     photoPreview.classList.add('show');
   }
 
-  // Load chips
   loadChips(about.chips || []);
 }
 
@@ -272,7 +358,8 @@ function saveAbout(e) {
   data.about.introduction = document.getElementById('about-intro').value;
   data.about.chips = [...currentChips];
   savePortfolioData(data);
-  showToast('About section saved!', 'success');
+  markDraftChanged();
+  showToast('About section saved! Click Publish to go live.', 'success');
 }
 
 // ---- Projects Panel ----
@@ -335,7 +422,6 @@ function showProjectModal(project = null) {
     </form>
   `;
 
-  // Image preview binding
   const imgInput = document.getElementById('pm-image');
   const imgPreview = document.getElementById('pm-image-preview');
   imgInput.addEventListener('input', () => {
@@ -377,6 +463,7 @@ function saveProjectModal() {
   savePortfolioData(data);
   loadProjectsPanel(data.projects);
   closeModal();
+  markDraftChanged();
   showToast(id ? 'Project updated!' : 'Project added!', 'success');
 }
 
@@ -392,6 +479,7 @@ function deleteProject(id) {
   data.projects = data.projects.filter(p => p.id !== id);
   savePortfolioData(data);
   loadProjectsPanel(data.projects);
+  markDraftChanged();
   showToast('Project deleted', 'success');
 }
 
@@ -472,6 +560,7 @@ function saveExperienceModal() {
   savePortfolioData(data);
   loadExperiencePanel(data.experience);
   closeModal();
+  markDraftChanged();
   showToast(id ? 'Experience updated!' : 'Experience added!', 'success');
 }
 
@@ -487,6 +576,7 @@ function deleteExperience(id) {
   data.experience = data.experience.filter(e => e.id !== id);
   savePortfolioData(data);
   loadExperiencePanel(data.experience);
+  markDraftChanged();
   showToast('Experience deleted', 'success');
 }
 
@@ -567,6 +657,7 @@ function saveEducationModal() {
   savePortfolioData(data);
   loadEducationPanel(data.education);
   closeModal();
+  markDraftChanged();
   showToast(id ? 'Education updated!' : 'Education added!', 'success');
 }
 
@@ -582,6 +673,7 @@ function deleteEducation(id) {
   data.education = data.education.filter(e => e.id !== id);
   savePortfolioData(data);
   loadEducationPanel(data.education);
+  markDraftChanged();
   showToast('Education deleted', 'success');
 }
 
@@ -601,7 +693,8 @@ function saveContact(e) {
   data.contact.location = document.getElementById('contact-location').value;
   data.contact.availability = document.getElementById('contact-availability').value;
   savePortfolioData(data);
-  showToast('Contact info saved!', 'success');
+  markDraftChanged();
+  showToast('Contact info saved! Click Publish to go live.', 'success');
 }
 
 // ---- Modal ----
