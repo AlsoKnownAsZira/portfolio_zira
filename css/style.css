@@ -415,6 +415,7 @@ ul { list-style: none; }
   transition: var(--transition);
   border: none;
   outline: none;
+  white-space: nowrap;
 }
 
 .btn-primary {
