@@ -240,38 +240,45 @@
       <!-- ============ SETTINGS PANEL ============ -->
       <div class="admin-panel" id="panel-settings">
 
-        <!-- GitHub Configuration -->
+        <!-- Supabase Configuration -->
         <div class="card" style="margin-bottom:1.5rem;">
-          <div class="card-header"><h3>⚡ GitHub Configuration</h3></div>
+          <div class="card-header"><h3>⚡ Supabase Configuration</h3></div>
           <div class="gh-info-box">
-            <strong>How Publish Works:</strong> When you click "Publish", the admin dashboard commits your changes as <code>data.json</code> to your GitHub repo via the GitHub API. GitHub Pages then auto-rebuilds your live site (~30 seconds).
+            <strong>How it works:</strong> Your portfolio data is stored in a Supabase database. When you click "Publish", changes are saved to Supabase instantly — no rebuild needed!
             <ol>
-              <li>Create a <strong>GitHub Personal Access Token</strong> at <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent)">github.com/settings/tokens</a></li>
-              <li>Select <strong>Fine-grained token</strong> → Repository access: <strong>Only select repositories</strong> → choose your portfolio repo</li>
-              <li>Permissions → Contents: <strong>Read and write</strong></li>
-              <li>Generate and paste the token below</li>
+              <li>Go to <a href="https://supabase.com" target="_blank" style="color:var(--accent)">supabase.com</a> → Create a free project</li>
+              <li>Open <strong>SQL Editor</strong> and run this query:</li>
+            </ol>
+            <pre style="background:rgba(0,0,0,0.3);padding:0.75rem;border-radius:6px;overflow-x:auto;font-size:0.78rem;margin:0.5rem 0;"><code>CREATE TABLE portfolio_data (
+  id int4 PRIMARY KEY DEFAULT 1,
+  content jsonb NOT NULL DEFAULT '{}',
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE portfolio_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read" ON portfolio_data
+  FOR SELECT USING (true);
+
+CREATE POLICY "Public write" ON portfolio_data
+  FOR ALL USING (true) WITH CHECK (true);
+
+INSERT INTO portfolio_data (id, content) VALUES (1, '{}');</code></pre>
+            <ol start="3">
+              <li>Go to <strong>Settings → API</strong> → copy <strong>Project URL</strong> and <strong>anon public</strong> key</li>
+              <li>Paste them below and click Save</li>
             </ol>
           </div>
-          <form id="github-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label>GitHub Username</label>
-                <input type="text" class="form-input" id="gh-owner" placeholder="e.g. johndoe" />
-              </div>
-              <div class="form-group">
-                <label>Repository Name</label>
-                <input type="text" class="form-input" id="gh-repo" placeholder="e.g. webportfolio" />
-              </div>
+          <form id="supabase-form">
+            <div class="form-group">
+              <label>Supabase Project URL</label>
+              <input type="url" class="form-input" id="sb-url" placeholder="https://xxxx.supabase.co" />
             </div>
             <div class="form-group">
-              <label>Personal Access Token</label>
-              <input type="password" class="form-input" id="gh-token" placeholder="github_pat_..." />
+              <label>Anon Public Key</label>
+              <input type="text" class="form-input" id="sb-anon-key" placeholder="eyJhbGciOi..." />
             </div>
-            <div class="form-group">
-              <label>Branch</label>
-              <input type="text" class="form-input" id="gh-branch" placeholder="main" value="main" />
-            </div>
-            <button type="submit" class="btn btn-primary">Save GitHub Config</button>
+            <button type="submit" class="btn btn-primary">Save Supabase Config</button>
           </form>
         </div>
 

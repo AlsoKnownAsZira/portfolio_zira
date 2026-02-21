@@ -3,7 +3,37 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const data = await fetchPortfolioData();
+  let data = null;
+
+  // Try fetching from Supabase if configured
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/portfolio_data?id=eq.1&select=content`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows.length > 0 && rows[0].content && Object.keys(rows[0].content).length > 0) {
+          data = rows[0].content;
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase fetch failed:', e.message);
+    }
+  }
+
+  // Fallback to data.json
+  if (!data) {
+    try {
+      const res = await fetch('data.json?t=' + Date.now());
+      if (res.ok) data = await res.json();
+    } catch (e) {}
+  }
+
+  // Final fallback
   if (!data) return;
 
   renderHero(data.hero);
@@ -208,7 +238,7 @@ function initRevealAnimations() {
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
+      if (isIntersecting(entry)) {
         entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       }
@@ -216,4 +246,8 @@ function initRevealAnimations() {
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
   reveals.forEach(el => observer.observe(el));
+}
+
+function isIntersecting(entry) {
+  return entry.isIntersecting;
 }

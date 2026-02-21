@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdminData();
 });
 
-// ---- Init: load data from data.json ----
+// ---- Init: load data from Supabase ----
 async function initAdminData() {
   const data = await loadAdminData();
   if (data) {
     loadAllPanels(data);
   }
-  loadGitHubConfig();
+  loadSupabaseConfig();
 }
 
 // ---- Login ----
@@ -150,8 +150,8 @@ function initPanels() {
   // Publish button
   document.getElementById('btn-publish').addEventListener('click', handlePublish);
 
-  // GitHub config form
-  document.getElementById('github-form').addEventListener('submit', saveGitHubConfigForm);
+  // Supabase config form
+  document.getElementById('supabase-form').addEventListener('submit', saveSupabaseConfigForm);
 
   // Password form
   document.getElementById('password-form').addEventListener('submit', changePassword);
@@ -169,7 +169,7 @@ function loadAllPanels(data) {
   loadContactPanel(data.contact);
 }
 
-// ---- Publish to GitHub ----
+// ---- Publish to Supabase ----
 async function handlePublish() {
   const btn = document.getElementById('btn-publish');
   const data = getPortfolioData();
@@ -179,9 +179,8 @@ async function handlePublish() {
     return;
   }
 
-  const config = getGitHubConfig();
-  if (!config.owner || !config.repo || !config.token) {
-    showToast('Configure GitHub first! Go to Settings → GitHub Configuration', 'error');
+  if (!isSupabaseConfigured()) {
+    showToast('Configure Supabase first! Go to Settings → Supabase Configuration', 'error');
     switchPanel('settings');
     document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
     document.querySelector('[data-panel="settings"]').classList.add('active');
@@ -192,8 +191,8 @@ async function handlePublish() {
   btn.innerHTML = '<span class="spinner"></span> Publishing...';
 
   try {
-    await publishToGitHub(data);
-    showToast('✅ Published! Your site will update in ~30 seconds.', 'success');
+    await publishToSupabase(data);
+    showToast('✅ Published! Changes are live now.', 'success');
     updatePublishStatus('published');
   } catch (err) {
     showToast('Publish failed: ' + err.message, 'error');
@@ -223,25 +222,21 @@ function markDraftChanged() {
   updatePublishStatus('draft');
 }
 
-// ---- GitHub Config ----
-function loadGitHubConfig() {
-  const config = getGitHubConfig();
-  document.getElementById('gh-owner').value = config.owner || '';
-  document.getElementById('gh-repo').value = config.repo || '';
-  document.getElementById('gh-token').value = config.token || '';
-  document.getElementById('gh-branch').value = config.branch || 'main';
+// ---- Supabase Config ----
+function loadSupabaseConfig() {
+  const config = getSupabaseConfig();
+  document.getElementById('sb-url').value = config.url || '';
+  document.getElementById('sb-anon-key').value = config.anonKey || '';
 }
 
-function saveGitHubConfigForm(e) {
+function saveSupabaseConfigForm(e) {
   e.preventDefault();
   const config = {
-    owner: document.getElementById('gh-owner').value.trim(),
-    repo: document.getElementById('gh-repo').value.trim(),
-    token: document.getElementById('gh-token').value.trim(),
-    branch: document.getElementById('gh-branch').value.trim() || 'main'
+    url: document.getElementById('sb-url').value.trim(),
+    anonKey: document.getElementById('sb-anon-key').value.trim()
   };
-  saveGitHubConfig(config);
-  showToast('GitHub configuration saved!', 'success');
+  saveSupabaseConfig(config);
+  showToast('Supabase configuration saved!', 'success');
 }
 
 // ---- Hero Panel ----

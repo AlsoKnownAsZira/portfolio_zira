@@ -1,11 +1,11 @@
 // ============================================
-// DATA LAYER — data.json + GitHub API CMS
+// DATA LAYER — Supabase CMS
 // ============================================
 
+const SUPABASE_CONFIG_KEY = 'portfolio_supabase_config';
 const DATA_KEY = 'portfolio_data';
-const GITHUB_CONFIG_KEY = 'portfolio_github_config';
 
-// Embedded default data (fallback)
+// Default data (used as fallback & initial seed)
 const DEFAULT_DATA = {
   hero: {
     name: 'John Doe',
@@ -41,28 +41,112 @@ const DEFAULT_DATA = {
   contact: { email: 'hello@example.com', location: 'Jakarta, Indonesia', availability: 'Open to freelance & full-time opportunities' }
 };
 
-// ---- Fetch data from data.json (for portfolio visitors) ----
-async function fetchPortfolioData() {
+// ============ Supabase Config ============
+
+function getSupabaseConfig() {
   try {
-    const res = await fetch('data.json?t=' + Date.now());
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.warn('Failed to fetch data.json');
+    const stored = localStorage.getItem(SUPABASE_CONFIG_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  return { url: '', anonKey: '' };
+}
+
+function saveSupabaseConfig(config) {
+  localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify(config));
+}
+
+function isSupabaseConfigured() {
+  const c = getSupabaseConfig();
+  return !!(c.url && c.anonKey);
+}
+
+// ============ Supabase API Helpers ============
+
+async function supabaseRequest(method, endpoint, body = null) {
+  const config = getSupabaseConfig();
+  if (!config.url || !config.anonKey) {
+    throw new Error('Supabase not configured');
   }
-  // Fallback: try localStorage, then default
+
+  const url = `${config.url}/rest/v1/${endpoint}`;
+  const headers = {
+    'apikey': config.anonKey,
+    'Authorization': `Bearer ${config.anonKey}`,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'return=representation' : (method === 'PATCH' ? 'return=representation' : undefined)
+  };
+
+  // Remove undefined headers
+  Object.keys(headers).forEach(k => headers[k] === undefined && delete headers[k]);
+
+  const options = { method, headers };
+  if (body) options.body = JSON.stringify(body);
+
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Supabase error: ${res.status} ${err}`);
+  }
+
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// ============ Fetch Data (for portfolio visitors) ============
+
+async function fetchPortfolioData() {
+  // Try Supabase first
+  if (isSupabaseConfigured()) {
+    try {
+      const rows = await supabaseRequest('GET', 'portfolio_data?id=eq.1&select=content');
+      if (rows && rows.length > 0 && rows[0].content) {
+        return rows[0].content;
+      }
+    } catch (e) {
+      console.warn('Supabase fetch failed:', e.message);
+    }
+  }
+
+  // Fallback: localStorage then defaults
   return getPortfolioData() || JSON.parse(JSON.stringify(DEFAULT_DATA));
 }
 
-// ---- localStorage access (for admin) ----
+// ============ Save to Supabase ============
+
+async function publishToSupabase(data) {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase not configured. Go to Settings to set up.');
+  }
+
+  // Try to update existing row
+  try {
+    const rows = await supabaseRequest('GET', 'portfolio_data?id=eq.1&select=id');
+    if (rows && rows.length > 0) {
+      // Update
+      await supabaseRequest('PATCH', 'portfolio_data?id=eq.1', {
+        content: data,
+        updated_at: new Date().toISOString()
+      });
+    } else {
+      // Insert
+      await supabaseRequest('POST', 'portfolio_data', {
+        id: 1,
+        content: data,
+        updated_at: new Date().toISOString()
+      });
+    }
+  } catch (e) {
+    throw new Error('Failed to save: ' + e.message);
+  }
+}
+
+// ============ localStorage (admin draft) ============
+
 function getPortfolioData() {
   try {
     const stored = localStorage.getItem(DATA_KEY);
     if (stored) return JSON.parse(stored);
-  } catch (e) {
-    console.warn('Failed to parse stored data.');
-  }
+  } catch (e) {}
   return null;
 }
 
@@ -70,96 +154,32 @@ function savePortfolioData(data) {
   localStorage.setItem(DATA_KEY, JSON.stringify(data));
 }
 
-// ---- Load data for admin ----
+// ============ Load data for admin ============
+
 async function loadAdminData() {
-  // Always prioritize localStorage (user's working draft)
+  // Priority: localStorage draft → Supabase → defaults
   const local = getPortfolioData();
   if (local) return local;
 
-  // No local draft — fetch from data.json and cache it
-  try {
-    const res = await fetch('data.json?t=' + Date.now());
-    if (res.ok) {
-      const data = await res.json();
-      savePortfolioData(data);
-      return data;
+  if (isSupabaseConfigured()) {
+    try {
+      const rows = await supabaseRequest('GET', 'portfolio_data?id=eq.1&select=content');
+      if (rows && rows.length > 0 && rows[0].content) {
+        savePortfolioData(rows[0].content);
+        return rows[0].content;
+      }
+    } catch (e) {
+      console.warn('Failed to load from Supabase:', e.message);
     }
-  } catch (e) {}
+  }
 
-  // Final fallback: use default data
   const fallback = JSON.parse(JSON.stringify(DEFAULT_DATA));
   savePortfolioData(fallback);
   return fallback;
 }
 
-// ---- GitHub Config ----
-function getGitHubConfig() {
-  try {
-    const stored = localStorage.getItem(GITHUB_CONFIG_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch (e) {}
-  return { owner: '', repo: '', token: '', branch: 'main' };
-}
+// ============ Export / Import ============
 
-function saveGitHubConfig(config) {
-  localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(config));
-}
-
-// ---- Publish to GitHub (commits data.json to repo) ----
-async function publishToGitHub(data) {
-  const config = getGitHubConfig();
-
-  if (!config.owner || !config.repo || !config.token) {
-    throw new Error('GitHub not configured. Go to Settings → GitHub to set up.');
-  }
-
-  const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/data.json`;
-
-  // Get current file SHA (required for updates)
-  let sha = null;
-  try {
-    const getRes = await fetch(apiUrl, {
-      headers: {
-        'Authorization': `Bearer ${config.token}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    if (getRes.ok) {
-      const fileInfo = await getRes.json();
-      sha = fileInfo.sha;
-    }
-  } catch (e) {}
-
-  // Encode content as base64
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-
-  const body = {
-    message: 'Update portfolio content via admin dashboard',
-    content: content,
-    branch: config.branch || 'main'
-  };
-
-  if (sha) body.sha = sha;
-
-  const putRes = await fetch(apiUrl, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${config.token}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-
-  if (!putRes.ok) {
-    const error = await putRes.json();
-    throw new Error(error.message || 'Failed to publish to GitHub');
-  }
-
-  return await putRes.json();
-}
-
-// ---- Export/Import ----
 function exportDataAsJSON() {
   const data = getPortfolioData() || DEFAULT_DATA;
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
