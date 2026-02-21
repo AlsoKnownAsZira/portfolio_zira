@@ -135,14 +135,11 @@ function initPanels() {
   });
 
   document.getElementById('btn-reset').addEventListener('click', async () => {
-    if (confirm('Are you sure? This will reload data from the live site.')) {
-      clearLocalDraft();
-      const data = await fetchPortfolioData();
-      if (data) {
-        savePortfolioData(data);
-        loadAllPanels(data);
-      }
-      showToast('Data reloaded from live site', 'success');
+    if (confirm('Are you sure? This will reset all data to defaults.')) {
+      localStorage.removeItem(DATA_KEY);
+      const data = await loadAdminData();
+      loadAllPanels(data);
+      showToast('Data reloaded successfully', 'success');
     }
   });
 
@@ -196,7 +193,6 @@ async function handlePublish() {
 
   try {
     await publishToGitHub(data);
-    clearLocalDraft();
     showToast('✅ Published! Your site will update in ~30 seconds.', 'success');
     updatePublishStatus('published');
   } catch (err) {
