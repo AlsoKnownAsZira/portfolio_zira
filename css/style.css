@@ -6,22 +6,22 @@
 
 /* ---- CSS Variables ---- */
 :root {
-  --bg-primary: #0a0a0b;
-  --bg-secondary: #111113;
-  --bg-card: #16161a;
-  --bg-card-hover: #1c1c21;
-  --bg-glass: rgba(22, 22, 26, 0.7);
-  --border: rgba(255, 255, 255, 0.06);
-  --border-hover: rgba(255, 255, 255, 0.12);
+  --bg-primary: #1a1d42;
+  --bg-secondary: #212458;
+  --bg-card: #2D336B;
+  --bg-card-hover: #353a78;
+  --bg-glass: rgba(45, 51, 107, 0.7);
+  --border: rgba(169, 181, 223, 0.12);
+  --border-hover: rgba(169, 181, 223, 0.25);
 
-  --text-primary: #eeeeee;
-  --text-secondary: #94949e;
-  --text-tertiary: #5a5a66;
+  --text-primary: #FFF2F2;
+  --text-secondary: #A9B5DF;
+  --text-tertiary: #7886C7;
 
-  --accent: #6c63ff;
-  --accent-soft: rgba(108, 99, 255, 0.12);
-  --accent-glow: rgba(108, 99, 255, 0.3);
-  --accent-2: #00d4aa;
+  --accent: #7886C7;
+  --accent-soft: rgba(120, 134, 199, 0.15);
+  --accent-glow: rgba(120, 134, 199, 0.35);
+  --accent-2: #A9B5DF;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -113,7 +113,7 @@ ul {
   height: 500px;
   background: radial-gradient(
     circle,
-    rgba(0, 212, 170, 0.2) 0%,
+    rgba(169, 181, 223, 0.2) 0%,
     transparent 70%
   );
   opacity: 0.12;
@@ -159,13 +159,13 @@ ul {
   z-index: 1000;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  background: rgba(10, 10, 11, 0.8);
+  background: rgba(26, 29, 66, 0.8);
   border-bottom: 1px solid var(--border);
   transition: var(--transition);
 }
 
 .navbar.scrolled {
-  background: rgba(10, 10, 11, 0.95);
+  background: rgba(26, 29, 66, 0.95);
   box-shadow: var(--shadow-sm);
 }
 
@@ -309,7 +309,7 @@ ul {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: var(--accent-soft);
-  border: 1px solid rgba(108, 99, 255, 0.2);
+  border: 1px solid rgba(120, 134, 199, 0.25);
   border-radius: 100px;
   font-size: 0.8rem;
   font-weight: 500;
@@ -508,7 +508,7 @@ ul {
 
 .chip:hover {
   color: var(--accent);
-  border-color: rgba(108, 99, 255, 0.3);
+  border-color: rgba(120, 134, 199, 0.3);
   background: var(--accent-soft);
 }
 
@@ -557,7 +557,7 @@ ul {
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(10, 10, 11, 0.9) 0%,
+    rgba(26, 29, 66, 0.9) 0%,
     transparent 60%
   );
   opacity: 0;
