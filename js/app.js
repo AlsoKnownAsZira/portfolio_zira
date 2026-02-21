@@ -153,6 +153,20 @@ function initNavbar() {
       });
     });
   }
+
+  // Theme toggle
+  var saved = localStorage.getItem('portfolio_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+
+  var toggle = document.getElementById('theme-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', function() {
+      var current = document.documentElement.getAttribute('data-theme');
+      var next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('portfolio_theme', next);
+    });
+  }
 }
 
 function initRevealAnimations() {
