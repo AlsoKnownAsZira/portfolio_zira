@@ -560,8 +560,12 @@ async function loadMessages() {
     var messages = await res.json();
     renderMessages(messages);
     updateBadge(messages);
+    var setupBox = document.getElementById('messages-setup');
+    if (setupBox) setupBox.style.display = 'none';
   } catch (err) {
     document.getElementById('messages-list').innerHTML = '<div class="empty-state">Failed to load messages. Make sure the contact_messages table exists.</div>';
+    var setupBox = document.getElementById('messages-setup');
+    if (setupBox) setupBox.style.display = '';
   }
 }
 
