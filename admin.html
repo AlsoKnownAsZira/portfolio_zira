@@ -111,6 +111,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 6 3 6 3s6-1 6-3v-5"/></svg>
           Education
         </button>
+        <button class="sidebar-nav-item" data-panel="messages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Messages <span id="msg-badge" class="msg-badge" style="display:none"></span>
+        </button>
         <button class="sidebar-nav-item" data-panel="settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           Settings
@@ -234,6 +238,42 @@
             <button class="btn btn-primary btn-sm" onclick="showEducationModal()">+ Add Education</button>
           </div>
           <div id="education-list" class="items-list"></div>
+        </div>
+      </div>
+
+      <!-- ============ MESSAGES PANEL ============ -->
+      <div class="admin-panel" id="panel-messages">
+        <div class="card">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>📬 Inbox</h3>
+            <button class="btn btn-ghost btn-sm" id="btn-refresh-msgs" style="padding:0.4rem 0.8rem;font-size:0.8rem;">↻ Refresh</button>
+          </div>
+          <div class="gh-info-box" style="margin-bottom:1rem;">
+            <strong>Setup:</strong> Run this SQL in Supabase SQL Editor to create the messages table:
+            <pre style="background:rgba(0,0,0,0.3);padding:0.75rem;border-radius:6px;overflow-x:auto;font-size:0.78rem;margin:0.5rem 0;"><code>CREATE TABLE contact_messages (
+  id bigserial PRIMARY KEY,
+  name text NOT NULL,
+  email text NOT NULL,
+  message text NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  is_read boolean DEFAULT false
+);
+
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public insert" ON contact_messages
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Public read" ON contact_messages
+  FOR SELECT USING (true);
+
+CREATE POLICY "Public delete" ON contact_messages
+  FOR DELETE USING (true);
+
+CREATE POLICY "Public update" ON contact_messages
+  FOR UPDATE USING (true) WITH CHECK (true);</code></pre>
+          </div>
+          <div id="messages-list"></div>
         </div>
       </div>
 

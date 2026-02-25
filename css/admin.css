@@ -685,3 +685,68 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* ---- Message Cards ---- */
+.msg-badge {
+  background: var(--danger);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 100px;
+  margin-left: 0.25rem;
+}
+
+.msg-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  transition: var(--transition);
+}
+
+.msg-card:hover {
+  border-color: var(--border-hover);
+}
+
+.msg-card.unread {
+  border-left: 3px solid var(--accent);
+}
+
+.msg-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
+}
+
+.msg-sender {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.msg-email {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.msg-time {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.msg-body {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+  white-space: pre-wrap;
+}
+
+.msg-actions {
+  display: flex;
+  gap: 0.5rem;
+}

@@ -80,8 +80,34 @@
       </div>
     </section>
 
-    <!-- Footer / Contact -->
-    <footer class="footer" id="contact">
+    <!-- Contact Form -->
+    <section class="section" id="contact">
+      <div class="section-inner reveal">
+        <span class="section-label">Contact</span>
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="section-subtitle">Have a question or want to work together? Drop me a message!</p>
+        <form class="contact-form" id="contact-form">
+          <div class="contact-form-row">
+            <div class="form-group">
+              <label for="cf-name">Name</label>
+              <input type="text" class="form-input" id="cf-name" placeholder="Your name" required />
+            </div>
+            <div class="form-group">
+              <label for="cf-email">Email</label>
+              <input type="email" class="form-input" id="cf-email" placeholder="your@email.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="cf-message">Message</label>
+            <textarea class="form-textarea" id="cf-message" rows="5" placeholder="Write your message here..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="cf-submit">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
       <div class="footer-inner">
         <div id="footer-info" class="footer-info"></div>
         <div id="footer-socials" class="footer-links"></div>
@@ -91,6 +117,9 @@
         All rights reserved.
       </div>
     </footer>
+
+    <!-- Toast -->
+    <div id="page-toast" class="page-toast-container"></div>
 
     <script src="js/config.js"></script>
     <script src="js/data.js"></script>

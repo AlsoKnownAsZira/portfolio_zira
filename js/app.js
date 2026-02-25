@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   renderFooter(data.hero, data.contact);
   initNavbar();
   initRevealAnimations();
+  initContactForm();
 });
 
 // ---- SVG Icons ----
@@ -181,4 +182,62 @@ function initRevealAnimations() {
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   reveals.forEach(function(el) { observer.observe(el); });
+}
+
+// ---- Contact Form ----
+function initContactForm() {
+  var form = document.getElementById('contact-form');
+  if (!form) return;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('cf-submit');
+    var name = document.getElementById('cf-name').value.trim();
+    var email = document.getElementById('cf-email').value.trim();
+    var message = document.getElementById('cf-message').value.trim();
+
+    if (!name || !email || !message) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    try {
+      if (typeof SUPABASE_URL === 'undefined' || !SUPABASE_URL) throw new Error('Not configured');
+
+      var res = await fetch(SUPABASE_URL + '/rest/v1/contact_messages', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          message: message
+        })
+      });
+
+      if (!res.ok) throw new Error('Failed to send');
+
+      form.reset();
+      pageToast('Message sent! I\'ll get back to you soon.', 'success');
+    } catch (err) {
+      pageToast('Failed to send message. Please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Message';
+    }
+  });
+}
+
+function pageToast(msg, type) {
+  var container = document.getElementById('page-toast');
+  if (!container) return;
+  var el = document.createElement('div');
+  el.className = 'page-toast ' + (type || 'success');
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(function() { el.remove(); }, 4000);
 }

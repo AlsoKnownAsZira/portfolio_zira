@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initSidebar();
   initPanels();
   initAdminData();
+  initMessages();
 });
 
 async function initAdminData() {
@@ -79,7 +80,8 @@ function switchPanel(panelId) {
     projects: { title: 'Projects', desc: 'Add, edit, or remove your portfolio projects' },
     experience: { title: 'Experience', desc: 'Manage your work experience entries' },
     education: { title: 'Education', desc: 'Manage your education history' },
-    settings: { title: 'Settings', desc: 'Supabase config, export/import, and contact info' }
+    settings: { title: 'Settings', desc: 'Supabase config, export/import, and contact info' },
+    messages: { title: 'Messages', desc: 'View messages from your contact form' }
   };
   var info = titles[panelId] || { title: 'Dashboard', desc: '' };
   document.getElementById('panel-title').textContent = info.title;
@@ -531,4 +533,116 @@ function showToast(message, type) {
   toast.textContent = message;
   container.appendChild(toast);
   setTimeout(function() { toast.remove(); }, 3000);
+}
+
+// ---- Messages ----
+function initMessages() {
+  var refreshBtn = document.getElementById('btn-refresh-msgs');
+  if (refreshBtn) refreshBtn.addEventListener('click', loadMessages);
+  loadMessages();
+}
+
+async function loadMessages() {
+  var config = getSupabaseConfig();
+  if (!config.url || !config.key) {
+    document.getElementById('messages-list').innerHTML = '<div class="empty-state">Configure Supabase in Settings first.</div>';
+    return;
+  }
+
+  try {
+    var res = await fetch(config.url + '/rest/v1/contact_messages?order=created_at.desc', {
+      headers: {
+        'apikey': config.key,
+        'Authorization': 'Bearer ' + config.key
+      }
+    });
+    if (!res.ok) throw new Error('Failed to fetch');
+    var messages = await res.json();
+    renderMessages(messages);
+    updateBadge(messages);
+  } catch (err) {
+    document.getElementById('messages-list').innerHTML = '<div class="empty-state">Failed to load messages. Make sure the contact_messages table exists.</div>';
+  }
+}
+
+function renderMessages(messages) {
+  var container = document.getElementById('messages-list');
+  if (!messages || messages.length === 0) {
+    container.innerHTML = '<div class="empty-state">📭 No messages yet</div>';
+    return;
+  }
+
+  container.innerHTML = messages.map(function(m) {
+    var date = new Date(m.created_at);
+    var timeStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return '<div class="msg-card ' + (m.is_read ? '' : 'unread') + '" data-id="' + m.id + '">' +
+      '<div class="msg-card-header">' +
+        '<div>' +
+          '<div class="msg-sender">' + escapeHtml(m.name) + '</div>' +
+          '<div class="msg-email">' + escapeHtml(m.email) + '</div>' +
+        '</div>' +
+        '<span class="msg-time">' + timeStr + '</span>' +
+      '</div>' +
+      '<div class="msg-body">' + escapeHtml(m.message) + '</div>' +
+      '<div class="msg-actions">' +
+        (!m.is_read ? '<button class="btn btn-ghost btn-sm" onclick="markMessageRead(' + m.id + ')">✓ Mark Read</button>' : '') +
+        '<button class="btn btn-danger btn-sm" onclick="deleteMessage(' + m.id + ')">🗑 Delete</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function updateBadge(messages) {
+  var badge = document.getElementById('msg-badge');
+  if (!badge) return;
+  var unread = messages.filter(function(m) { return !m.is_read; }).length;
+  if (unread > 0) {
+    badge.textContent = unread;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+async function markMessageRead(id) {
+  var config = getSupabaseConfig();
+  try {
+    await fetch(config.url + '/rest/v1/contact_messages?id=eq.' + id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': config.key,
+        'Authorization': 'Bearer ' + config.key,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ is_read: true })
+    });
+    loadMessages();
+  } catch (err) {
+    showToast('Failed to update', 'error');
+  }
+}
+
+async function deleteMessage(id) {
+  if (!confirm('Delete this message?')) return;
+  var config = getSupabaseConfig();
+  try {
+    await fetch(config.url + '/rest/v1/contact_messages?id=eq.' + id, {
+      method: 'DELETE',
+      headers: {
+        'apikey': config.key,
+        'Authorization': 'Bearer ' + config.key
+      }
+    });
+    showToast('Message deleted', 'success');
+    loadMessages();
+  } catch (err) {
+    showToast('Failed to delete', 'error');
+  }
 }
