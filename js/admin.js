@@ -544,7 +544,7 @@ function initMessages() {
 
 async function loadMessages() {
   var config = getSupabaseConfig();
-  if (!config.url || !config.key) {
+  if (!config.url || !config.anonKey) {
     document.getElementById('messages-list').innerHTML = '<div class="empty-state">Configure Supabase in Settings first.</div>';
     return;
   }
@@ -552,8 +552,8 @@ async function loadMessages() {
   try {
     var res = await fetch(config.url + '/rest/v1/contact_messages?order=created_at.desc', {
       headers: {
-        'apikey': config.key,
-        'Authorization': 'Bearer ' + config.key
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey
       }
     });
     if (!res.ok) throw new Error('Failed to fetch');
@@ -616,8 +616,8 @@ async function markMessageRead(id) {
     await fetch(config.url + '/rest/v1/contact_messages?id=eq.' + id, {
       method: 'PATCH',
       headers: {
-        'apikey': config.key,
-        'Authorization': 'Bearer ' + config.key,
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
@@ -636,8 +636,8 @@ async function deleteMessage(id) {
     await fetch(config.url + '/rest/v1/contact_messages?id=eq.' + id, {
       method: 'DELETE',
       headers: {
-        'apikey': config.key,
-        'Authorization': 'Bearer ' + config.key
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey
       }
     });
     showToast('Message deleted', 'success');
