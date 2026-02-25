@@ -322,6 +322,38 @@ INSERT INTO portfolio_data (id, content) VALUES (1, '{}');</code></pre>
           </form>
         </div>
 
+        <!-- Discord Webhook -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header"><h3>🔔 Discord Notifications</h3></div>
+          <div class="gh-info-box" style="margin-bottom:1rem;">
+            <strong>Setup:</strong> First, run this SQL in Supabase to create the settings table:
+            <pre style="background:rgba(0,0,0,0.3);padding:0.75rem;border-radius:6px;overflow-x:auto;font-size:0.78rem;margin:0.5rem 0;"><code>CREATE TABLE site_settings (
+  key text PRIMARY KEY,
+  value text
+);
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public access" ON site_settings
+  FOR ALL USING (true) WITH CHECK (true);</code></pre>
+            <strong>How to get a Webhook URL:</strong>
+            <ol>
+              <li>Open Discord → go to your server</li>
+              <li>Right-click a channel → <strong>Edit Channel</strong> → <strong>Integrations</strong> → <strong>Webhooks</strong></li>
+              <li>Click <strong>New Webhook</strong> → copy the <strong>Webhook URL</strong></li>
+              <li>Paste it below and click Save</li>
+            </ol>
+          </div>
+          <form id="discord-form">
+            <div class="form-group">
+              <label>Discord Webhook URL</label>
+              <input type="url" class="form-input" id="discord-webhook-url" placeholder="https://discord.com/api/webhooks/..." />
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button type="submit" class="btn btn-primary">Save Webhook</button>
+              <button type="button" class="btn btn-ghost" id="btn-test-webhook">🧪 Test</button>
+            </div>
+          </form>
+        </div>
+
         <!-- Contact Info -->
         <div class="card" style="margin-bottom:1.5rem;">
           <div class="card-header"><h3>Contact Info</h3></div>

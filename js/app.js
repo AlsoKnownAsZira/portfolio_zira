@@ -223,6 +223,9 @@ function initContactForm() {
 
       form.reset();
       pageToast('Message sent! I\'ll get back to you soon.', 'success');
+
+      // Send Discord notification (fire-and-forget)
+      sendDiscordNotification(name, email, message);
     } catch (err) {
       pageToast('Failed to send message. Please try again.', 'error');
     } finally {
@@ -240,4 +243,40 @@ function pageToast(msg, type) {
   el.textContent = msg;
   container.appendChild(el);
   setTimeout(function() { el.remove(); }, 4000);
+}
+
+function sendDiscordNotification(name, email, message) {
+  if (typeof SUPABASE_URL === 'undefined' || !SUPABASE_URL) return;
+
+  // Fetch webhook URL from Supabase site_settings
+  fetch(SUPABASE_URL + '/rest/v1/site_settings?key=eq.discord_webhook&select=value', {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    }
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(rows) {
+    if (!rows || !rows.length || !rows[0].value) return;
+    var webhookUrl = rows[0].value;
+
+    return fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '📬 New Contact Message',
+          color: 3447003,
+          fields: [
+            { name: '👤 Name', value: name, inline: true },
+            { name: '📧 Email', value: email, inline: true },
+            { name: '💬 Message', value: message }
+          ],
+          timestamp: new Date().toISOString(),
+          footer: { text: 'Portfolio Contact Form' }
+        }]
+      })
+    });
+  })
+  .catch(function() {});
 }

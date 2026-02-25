@@ -145,6 +145,9 @@ function initPanels() {
   document.getElementById('btn-publish').addEventListener('click', handlePublish);
   document.getElementById('supabase-form').addEventListener('submit', saveSupabaseConfigForm);
   document.getElementById('password-form').addEventListener('submit', changePassword);
+  document.getElementById('discord-form').addEventListener('submit', saveDiscordWebhook);
+  document.getElementById('btn-test-webhook').addEventListener('click', testDiscordWebhook);
+  loadDiscordWebhook();
 }
 
 // ---- Load All Panels ----
@@ -519,6 +522,103 @@ function changePassword(e) {
   document.getElementById('pw-new').value = '';
   document.getElementById('pw-confirm').value = '';
   showToast('Password changed successfully!', 'success');
+}
+
+// ---- Discord Webhook ----
+var DISCORD_WEBHOOK_KEY = 'portfolio_discord_webhook';
+
+async function saveDiscordWebhook(e) {
+  e.preventDefault();
+  var url = document.getElementById('discord-webhook-url').value.trim();
+  if (url && !url.startsWith('https://discord.com/api/webhooks/')) {
+    showToast('Invalid Discord webhook URL', 'error');
+    return;
+  }
+
+  var config = getSupabaseConfig();
+  if (!config.url || !config.anonKey) {
+    showToast('Configure Supabase first', 'error');
+    return;
+  }
+
+  try {
+    // Upsert: try update first, if not found then insert
+    var res = await fetch(config.url + '/rest/v1/site_settings?key=eq.discord_webhook', {
+      method: 'PATCH',
+      headers: {
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({ value: url })
+    });
+
+    var rows = await res.json();
+    if (!rows || rows.length === 0) {
+      // Row doesn't exist yet, insert it
+      await fetch(config.url + '/rest/v1/site_settings', {
+        method: 'POST',
+        headers: {
+          'apikey': config.anonKey,
+          'Authorization': 'Bearer ' + config.anonKey,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ key: 'discord_webhook', value: url })
+      });
+    }
+
+    showToast(url ? 'Discord webhook saved!' : 'Discord webhook removed', 'success');
+  } catch (err) {
+    showToast('Failed to save: ' + err.message, 'error');
+  }
+}
+
+async function loadDiscordWebhook() {
+  var config = getSupabaseConfig();
+  if (!config.url || !config.anonKey) return;
+
+  try {
+    var res = await fetch(config.url + '/rest/v1/site_settings?key=eq.discord_webhook&select=value', {
+      headers: {
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey
+      }
+    });
+    var rows = await res.json();
+    if (rows && rows.length > 0 && rows[0].value) {
+      document.getElementById('discord-webhook-url').value = rows[0].value;
+    }
+  } catch (e) {}
+}
+
+async function testDiscordWebhook() {
+  var url = document.getElementById('discord-webhook-url').value.trim();
+  if (!url) { showToast('Enter a webhook URL first', 'error'); return; }
+
+  try {
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '🧪 Test Notification',
+          description: 'Your Discord webhook is working! Contact form notifications will appear here.',
+          color: 3447003,
+          timestamp: new Date().toISOString(),
+          footer: { text: 'Portfolio Contact Form' }
+        }]
+      })
+    });
+    if (res.ok || res.status === 204) {
+      showToast('Test message sent to Discord!', 'success');
+    } else {
+      showToast('Failed: ' + res.status + ' ' + res.statusText, 'error');
+    }
+  } catch (err) {
+    showToast('Failed to send: ' + err.message, 'error');
+  }
 }
 
 // ---- Modal ----
