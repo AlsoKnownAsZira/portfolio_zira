@@ -1,0 +1,22 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Run every 6 days to prevent Supabase free tier from pausing
+    - cron: "0 8 */6 * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://lmcmqwzjteylqegotrdi.supabase.co/rest/v1/portfolio_data?id=eq.1&select=id" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "Supabase responded with status: $response"
+          if [ "$response" -ne 200 ]; then
+            echo "::warning::Supabase ping returned non-200 status: $response"
+          fi
