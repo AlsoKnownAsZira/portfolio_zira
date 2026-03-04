@@ -80,6 +80,18 @@
   color-scheme: light;
 }
 
+/* ---- View Transitions for Theme Ripple ---- */
+::view-transition-group(root) {
+  animation: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
 /* ---- Reset & Base ---- */
 *,
 *::before,

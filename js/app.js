@@ -204,11 +204,50 @@ function initNavbar() {
 
   var toggle = document.getElementById('theme-toggle');
   if (toggle) {
-    toggle.addEventListener('click', function() {
+    toggle.addEventListener('click', function(e) {
       var current = document.documentElement.getAttribute('data-theme');
       var next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('portfolio_theme', next);
+      
+      // Fallback if View Transitions API is not supported
+      if (!document.startViewTransition) {
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('portfolio_theme', next);
+        return;
+      }
+
+      // Calculate the click position, or default to center
+      var x = e.clientX || window.innerWidth / 2;
+      var y = e.clientY || window.innerHeight / 2;
+      
+      // Calculate the distance to the farthest corner to ensure the circle covers the screen
+      var endRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+      );
+
+      var transition = document.startViewTransition(function() {
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('portfolio_theme', next);
+      });
+
+      transition.ready.then(function() {
+        var clipPath = [
+          'circle(0px at ' + x + 'px ' + y + 'px)',
+          'circle(' + endRadius + 'px at ' + x + 'px ' + y + 'px)'
+        ];
+        
+        document.documentElement.animate(
+          {
+            clipPath: clipPath
+          },
+          {
+            duration: 500,
+            easing: 'ease-in-out',
+            // Always animate the new state expanding outwards over the old state
+            pseudoElement: '::view-transition-new(root)'
+          }
+        );
+      });
     });
   }
 }
