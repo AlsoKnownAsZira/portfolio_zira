@@ -104,6 +104,22 @@ body {
   transition: background var(--transition), color var(--transition);
 }
 
+/* Elegant Mesh Grid Background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(circle at 50% 50%, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 20%, transparent 80%);
+}
+
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 ul { list-style: none; }
@@ -479,7 +495,15 @@ ul { list-style: none; }
   margin-top: 3rem;
 }
 
-.about-photo-wrapper { position: relative; }
+.about-photo-wrapper { 
+  position: relative; 
+  perspective: 1200px;
+  --tiltX: 0deg;
+  --tiltY: 0deg;
+  --mouseX: 50%;
+  --mouseY: 50%;
+  z-index: 5;
+}
 
 .about-photo {
   width: 100%;
@@ -487,21 +511,69 @@ ul { list-style: none; }
   object-fit: cover;
   border-radius: var(--radius-lg);
   border: 2px solid var(--border);
-  transition: var(--transition);
+  transition: transform 0.15s ease-out, border-color var(--transition);
+  transform: rotateX(var(--tiltX)) rotateY(var(--tiltY));
+  position: relative;
+  z-index: 2;
+  box-shadow: var(--shadow-md);
 }
 
+/* Elegant Reactive Outline */
+.about-photo-wrapper::before,
 .about-photo-wrapper::after {
   content: "";
   position: absolute;
-  inset: -8px;
-  border-radius: calc(var(--radius-lg) + 8px);
-  border: 1px solid var(--accent-soft);
+  inset: -15px;
+  border-radius: calc(var(--radius-lg) + 15px);
   opacity: 0;
-  transition: var(--transition);
+  transition: opacity 0.4s ease, inset 0.4s ease, transform 0.15s ease-out;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.about-photo-wrapper:hover .about-photo { border-color: var(--accent); }
-.about-photo-wrapper:hover::after { opacity: 1; }
+.about-photo-wrapper::before {
+  border: 1px solid var(--accent);
+  background: radial-gradient(
+    circle 150px at var(--mouseX) var(--mouseY),
+    var(--accent-glow) 0%,
+    transparent 100%
+  );
+  transform: rotateX(calc(var(--tiltX) * 0.8)) rotateY(calc(var(--tiltY) * 0.8)) translateZ(-10px);
+}
+
+.about-photo-wrapper::after {
+  inset: -30px;
+  border-radius: calc(var(--radius-lg) + 30px);
+  border: 1px dashed var(--accent-2);
+  transform: translateZ(-20px);
+  animation: spinDashed 20s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes spinDashed {
+  0% { transform: translateZ(-20px) rotate(0deg); }
+  100% { transform: translateZ(-20px) rotate(360deg); }
+}
+
+.about-photo-wrapper.active .about-photo {
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+[data-theme="light"] .about-photo-wrapper.active .about-photo {
+  box-shadow: 0 20px 40px rgba(30,45,80,0.15);
+}
+
+.about-photo-wrapper.active::before {
+  opacity: 1;
+  inset: -10px;
+}
+
+.about-photo-wrapper.active::after {
+  opacity: 0.4;
+  inset: -20px;
+  animation-play-state: running;
+}
 
 .about-intro {
   font-size: 1.1rem;
@@ -548,6 +620,7 @@ ul { list-style: none; }
 }
 
 .project-card {
+  position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -564,6 +637,57 @@ ul { list-style: none; }
   border-color: var(--border-hover);
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+}
+
+/* Elegant Spotlight and Border Glow */
+.project-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.04),
+    transparent 40%
+  );
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+[data-theme="light"] .project-card::before {
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--accent-glow),
+    transparent 40%
+  );
+}
+
+.project-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(
+    400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--accent) 0%,
+    transparent 40%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 10;
+}
+
+.project-card:hover::before,
+.project-card:hover::after {
+  opacity: 1;
 }
 
 .project-image-wrapper {

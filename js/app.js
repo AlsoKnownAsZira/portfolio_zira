@@ -44,6 +44,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   initNavbar();
   initRevealAnimations();
   initContactForm();
+
+  // Initialize new decorative effects
+  initPhotoTilt();
+  initCardSpotlight();
 });
 
 // ---- SVG Icons ----
@@ -318,4 +322,52 @@ function sendDiscordNotification(name, email, message) {
     });
   })
   .catch(function() {});
+}
+
+// ---- Elegant Decorations ----
+
+function initPhotoTilt() {
+  var wrapper = document.querySelector('.about-photo-wrapper');
+  if (!wrapper) return;
+  wrapper.addEventListener('mousemove', function(e) {
+    var rect = wrapper.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    var cx = rect.width / 2;
+    var cy = rect.height / 2;
+    var tiltX = (cy - y) / 15;
+    var tiltY = (x - cx) / 15;
+    wrapper.style.setProperty('--tiltX', tiltX + 'deg');
+    wrapper.style.setProperty('--tiltY', tiltY + 'deg');
+    wrapper.style.setProperty('--mouseX', x + 'px');
+    wrapper.style.setProperty('--mouseY', y + 'px');
+  });
+  wrapper.addEventListener('mouseleave', function() {
+    wrapper.style.setProperty('--tiltX', '0deg');
+    wrapper.style.setProperty('--tiltY', '0deg');
+    wrapper.style.setProperty('--mouseX', '50%');
+    wrapper.style.setProperty('--mouseY', '50%');
+    wrapper.classList.remove('active');
+  });
+  wrapper.addEventListener('mouseenter', function() {
+    wrapper.classList.add('active');
+  });
+}
+
+function initCardSpotlight() {
+  var grid = document.getElementById('projects-grid');
+  if (!grid) return;
+  
+  grid.addEventListener('mousemove', function(e) {
+    var cards = document.querySelectorAll('.project-card');
+    cards.forEach(function(card) {
+      if (!card.classList.contains('project-card-hidden') || card.classList.contains('project-card-visible')) {
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', x + 'px');
+        card.style.setProperty('--mouse-y', y + 'px');
+      }
+    });
+  });
 }
