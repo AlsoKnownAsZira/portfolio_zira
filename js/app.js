@@ -92,13 +92,52 @@ function renderAbout(about) {
 function renderProjects(projects) {
   var container = document.getElementById('projects-grid');
   if (!container) return;
-  container.innerHTML = (projects || []).map(function(p) {
+  var VISIBLE_COUNT = 4;
+  var allProjects = projects || [];
+
+  container.innerHTML = allProjects.map(function(p, index) {
     var tagsHtml = (p.tags || []).map(function(t) { return '<span class="project-tag">' + t + '</span>'; }).join('');
     var overlayHtml = '';
     if (p.liveUrl) overlayHtml += '<a href="' + p.liveUrl + '" target="_blank" class="btn btn-primary">Live Demo ' + getIcon('external-link') + '</a>';
     if (p.repoUrl) overlayHtml += '<a href="' + p.repoUrl + '" target="_blank" class="btn btn-ghost">Source ' + getIcon('code') + '</a>';
-    return '<div class="project-card"><div class="project-image-wrapper"><img src="' + p.image + '" alt="' + p.title + '" class="project-image" onerror="this.src=\'https://via.placeholder.com/600x400?text=Project\'"/><div class="project-overlay">' + overlayHtml + '</div></div><div class="project-body"><h3 class="project-title">' + p.title + '</h3><p class="project-desc">' + p.description + '</p><div class="project-tags">' + tagsHtml + '</div></div></div>';
+    var hiddenClass = index >= VISIBLE_COUNT ? ' project-card-hidden' : '';
+    return '<div class="project-card' + hiddenClass + '"><div class="project-image-wrapper"><img src="' + p.image + '" alt="' + p.title + '" class="project-image" onerror="this.src=\'https://via.placeholder.com/600x400?text=Project\'"/><div class="project-overlay">' + overlayHtml + '</div></div><div class="project-body"><h3 class="project-title">' + p.title + '</h3><p class="project-desc">' + p.description + '</p><div class="project-tags">' + tagsHtml + '</div></div></div>';
   }).join('');
+
+  // Add "Show More" button if there are more than VISIBLE_COUNT projects
+  if (allProjects.length > VISIBLE_COUNT) {
+    var wrapper = container.parentElement;
+    var btnContainer = document.createElement('div');
+    btnContainer.className = 'projects-toggle-wrapper';
+    btnContainer.innerHTML = '<button class="btn btn-ghost projects-toggle-btn" id="projects-toggle">' +
+      '<span class="toggle-text">Show More</span>' +
+      '<span class="toggle-count">(' + (allProjects.length - VISIBLE_COUNT) + ' more)</span>' +
+      '<svg class="toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</button>';
+    wrapper.appendChild(btnContainer);
+
+    var expanded = false;
+    var toggleBtn = document.getElementById('projects-toggle');
+    toggleBtn.addEventListener('click', function() {
+      expanded = !expanded;
+      var hiddenCards = container.querySelectorAll('.project-card-hidden');
+      hiddenCards.forEach(function(card) {
+        if (expanded) {
+          card.classList.add('project-card-visible');
+        } else {
+          card.classList.remove('project-card-visible');
+        }
+      });
+      toggleBtn.querySelector('.toggle-text').textContent = expanded ? 'Show Less' : 'Show More';
+      toggleBtn.querySelector('.toggle-count').textContent = expanded ? '' : '(' + (allProjects.length - VISIBLE_COUNT) + ' more)';
+      toggleBtn.classList.toggle('expanded', expanded);
+
+      // Scroll back to projects section when collapsing
+      if (!expanded) {
+        document.getElementById('projects').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 }
 
 function renderExperience(experience) {

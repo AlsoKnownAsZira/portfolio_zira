@@ -635,6 +635,57 @@ ul { list-style: none; }
   color: var(--accent);
 }
 
+/* ---- Projects Toggle (Show More/Less) ---- */
+.project-card-hidden {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.project-card-hidden.project-card-visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.projects-toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.projects-toggle-btn {
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  font-size: 0.9rem;
+  border-radius: 100px;
+}
+
+.projects-toggle-btn .toggle-count {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.projects-toggle-btn .toggle-arrow {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.projects-toggle-btn.expanded .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.projects-toggle-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 /* ---- Timeline (Experience & Education) ---- */
 .timeline {
   margin-top: 3rem;
