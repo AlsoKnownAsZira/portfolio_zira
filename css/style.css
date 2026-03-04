@@ -1,45 +1,45 @@
 /* ============================================
    PORTFOLIO — Design System & Styles
-   Navy Blue Elegant Theme with Dark/Light Mode
+   Muted Blue Elegant Theme with Dark/Light Mode
    ============================================ */
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 /* ---- Dark Mode (default) ---- */
 :root {
-  --bg-primary: #0b0f1a;
-  --bg-secondary: #111827;
-  --bg-card: #1e2536;
-  --bg-card-hover: #252d40;
-  --bg-glass: rgba(11, 15, 26, 0.8);
-  --border: rgba(148, 163, 204, 0.1);
-  --border-hover: rgba(148, 163, 204, 0.2);
+  --bg-primary: #0c1017;
+  --bg-secondary: #121620;
+  --bg-card: #181d2a;
+  --bg-card-hover: #1f2535;
+  --bg-glass: rgba(12, 16, 23, 0.85);
+  --border: rgba(120, 140, 175, 0.08);
+  --border-hover: rgba(120, 140, 175, 0.15);
 
-  --text-primary: #f0f2f8;
-  --text-secondary: #94a3cc;
-  --text-tertiary: #5a6a8a;
+  --text-primary: #dde1ea;
+  --text-secondary: #8794b2;
+  --text-tertiary: #505d78;
 
-  --accent: #4f6dc7;
-  --accent-hover: #6380d6;
-  --accent-soft: rgba(79, 109, 199, 0.12);
-  --accent-glow: rgba(79, 109, 199, 0.3);
-  --accent-2: #7e9cef;
-  --accent-gradient: linear-gradient(135deg, #4f6dc7 0%, #7e9cef 50%, #a8c0ff 100%);
-  --accent-gradient-subtle: linear-gradient(135deg, rgba(79,109,199,0.15) 0%, rgba(126,156,239,0.08) 100%);
+  --accent: #3d5aad;
+  --accent-hover: #4d6bbf;
+  --accent-soft: rgba(61, 90, 173, 0.12);
+  --accent-glow: rgba(61, 90, 173, 0.22);
+  --accent-2: #6b8ad4;
+  --accent-gradient: linear-gradient(135deg, #3d5aad 0%, #5a79c8 50%, #7b9adf 100%);
+  --accent-gradient-subtle: linear-gradient(135deg, rgba(61,90,173,0.12) 0%, rgba(90,121,200,0.06) 100%);
 
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
+  --success: #5b9e8f;
+  --warning: #c4a254;
+  --danger: #c47070;
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 28px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
-  --shadow-accent: 0 4px 20px rgba(79, 109, 199, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.45);
+  --shadow-accent: 0 4px 20px rgba(61, 90, 173, 0.2);
 
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -52,30 +52,30 @@
 
 /* ---- Light Mode ---- */
 [data-theme="light"] {
-  --bg-primary: #f8f9fc;
-  --bg-secondary: #ffffff;
+  --bg-primary: #f4f5f9;
+  --bg-secondary: #fafbfe;
   --bg-card: #ffffff;
-  --bg-card-hover: #f1f3f9;
-  --bg-glass: rgba(248, 249, 252, 0.85);
-  --border: rgba(30, 50, 100, 0.08);
-  --border-hover: rgba(30, 50, 100, 0.15);
+  --bg-card-hover: #eef0f6;
+  --bg-glass: rgba(244, 245, 249, 0.88);
+  --border: rgba(90, 110, 155, 0.1);
+  --border-hover: rgba(90, 110, 155, 0.18);
 
-  --text-primary: #1a2140;
-  --text-secondary: #4a5578;
-  --text-tertiary: #8892aa;
+  --text-primary: #1e2844;
+  --text-secondary: #4f5a78;
+  --text-tertiary: #8e96ac;
 
-  --accent: #3b5bba;
-  --accent-hover: #4a6acc;
-  --accent-soft: rgba(59, 91, 186, 0.08);
-  --accent-glow: rgba(59, 91, 186, 0.15);
-  --accent-2: #5b7de0;
-  --accent-gradient: linear-gradient(135deg, #3b5bba 0%, #5b7de0 50%, #8ba4f0 100%);
-  --accent-gradient-subtle: linear-gradient(135deg, rgba(59,91,186,0.06) 0%, rgba(91,125,224,0.03) 100%);
+  --accent: #3552a0;
+  --accent-hover: #4463b2;
+  --accent-soft: rgba(53, 82, 160, 0.08);
+  --accent-glow: rgba(53, 82, 160, 0.14);
+  --accent-2: #5470bf;
+  --accent-gradient: linear-gradient(135deg, #3552a0 0%, #4d6db8 50%, #6d8dd5 100%);
+  --accent-gradient-subtle: linear-gradient(135deg, rgba(53,82,160,0.07) 0%, rgba(77,109,184,0.03) 100%);
 
-  --shadow-sm: 0 1px 3px rgba(30, 50, 100, 0.06);
-  --shadow-md: 0 4px 20px rgba(30, 50, 100, 0.08);
-  --shadow-lg: 0 8px 40px rgba(30, 50, 100, 0.1);
-  --shadow-accent: 0 4px 20px rgba(59, 91, 186, 0.15);
+  --shadow-sm: 0 1px 3px rgba(30, 45, 80, 0.06);
+  --shadow-md: 0 4px 20px rgba(30, 45, 80, 0.08);
+  --shadow-lg: 0 8px 40px rgba(30, 45, 80, 0.1);
+  --shadow-accent: 0 4px 20px rgba(53, 82, 160, 0.15);
 
   color-scheme: light;
 }
@@ -139,7 +139,7 @@ ul { list-style: none; }
   right: -10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(126, 156, 239, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(90, 112, 160, 0.1) 0%, transparent 70%);
   opacity: 0.15;
   animation: float2 25s ease-in-out infinite;
 }
