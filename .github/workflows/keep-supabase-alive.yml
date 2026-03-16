@@ -2,8 +2,8 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Run every 6 days to prevent Supabase free tier from pausing
-    - cron: "0 8 */6 * *"
+    # Run every 3 days to prevent Supabase free tier from pausing
+    - cron: "0 8 */3 * *"
   workflow_dispatch: # Allow manual trigger
 
 jobs:
