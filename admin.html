@@ -115,6 +115,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           Messages <span id="msg-badge" class="msg-badge" style="display:none"></span>
         </button>
+        <button class="sidebar-nav-item" data-panel="cvmaker">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          CV Maker
+        </button>
         <button class="sidebar-nav-item" data-panel="settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           Settings
@@ -274,6 +278,49 @@ CREATE POLICY "Public update" ON contact_messages
   FOR UPDATE USING (true) WITH CHECK (true);</code></pre>
           </div>
           <div id="messages-list"></div>
+        </div>
+      </div>
+
+      <!-- ============ CV MAKER PANEL ============ -->
+      <div class="admin-panel" id="panel-cvmaker">
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header">
+            <h3>📄 Generate Your CV</h3>
+          </div>
+          <div class="cv-toolbar">
+            <div class="cv-toolbar-group">
+              <label class="cv-toolbar-label">Template</label>
+              <select class="form-input cv-select" id="cv-template">
+                <option value="modern">Modern</option>
+                <option value="classic">Classic</option>
+                <option value="minimal">Minimal</option>
+              </select>
+            </div>
+            <div class="cv-toolbar-group">
+              <label class="cv-toolbar-label">Accent Color</label>
+              <div class="cv-color-row">
+                <input type="color" id="cv-accent-color" value="#6c63ff" class="cv-color-picker" />
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('cv-accent-color').value='#6c63ff';renderCVPreview()" title="Reset color">↺</button>
+              </div>
+            </div>
+            <div class="cv-toolbar-group">
+              <label class="cv-toolbar-label">Sections</label>
+              <div class="cv-toggles">
+                <label class="cv-toggle"><input type="checkbox" id="cv-toggle-skills" checked /><span class="cv-toggle-slider"></span> Skills</label>
+                <label class="cv-toggle"><input type="checkbox" id="cv-toggle-projects" checked /><span class="cv-toggle-slider"></span> Projects</label>
+                <label class="cv-toggle"><input type="checkbox" id="cv-toggle-photo" checked /><span class="cv-toggle-slider"></span> Photo</label>
+              </div>
+            </div>
+            <div class="cv-toolbar-group cv-toolbar-actions">
+              <button class="btn btn-primary" id="btn-download-cv">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cv-preview-frame" id="cv-preview-frame">
+          <div class="cv-preview" id="cv-preview"></div>
         </div>
       </div>
 
